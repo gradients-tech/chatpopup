@@ -4,8 +4,11 @@ Chat pop-up module that integrated with Gradients Conversation AI platform.
 
 ## License
 
-[GNU General Public License v3](https://github.com/gradients-tech/chatpopup/blob/main/LICENSE).<br>
+[GNU General Public License v3](https://github.com/gradients-tech/chatpopup/blob/main/LICENSE).
+
 Copyright &copy; 2023 [Gradients Technology](https://github.com/gradients-tech). All rights reserved.
+
+<hr/>
 
 ## Introduction
 
@@ -19,8 +22,9 @@ This chat module use Websockets to communicate with the server, allowing the use
 ## Technologies
 
 - [React v18](https://react.dev/): A JavaScript library for building user interfaces.
-- [Vite](https://vitejs.dev/): A build tool that uses **`ESBuild`**, which is written in **GO**, to bundle the code. **Faster than `Webpack`**.
 - Websockets: A protocol that allows for real-time communication between the client and the server.
+
+<hr/>
 
 ## Embedding
 
@@ -40,21 +44,23 @@ Using `defer` and `type="module"` only loads the script after the page has loade
 ### 2. Add the following code to the `<body>`
 
 ```html
-<div id="chat-module-root"></div>
+<div id="chat-module-root" data-host="ws://host"></div>
 ```
 
 The location of the chat does not matter, since it relies on `position: fixed;` to position itself at the bottom right corner of the screen.
 
 ### 3. Changing the endpoint
 
-The chat endpoint can be changed by modifying the `VITE_WS_HOST` variable in the `.env` file. The chat needs to be rebuilt for this change to take affect.
+The chat endpoint can be changed by modifying the `data-host` attribute of the `div`. This is mandatory for the chat to function.
+
+<hr/>
 
 ## Building
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/[your-username]/chat-module.git
+git clone https://github.com/gradients-tech/chatpopup.git
 ```
 
 ### 2. Install dependencies
@@ -87,7 +93,9 @@ npm run build
 
 ### 4. Embed the files from the `dist` directory into your website
 
-### Development
+<hr/>
+
+## Development
 
 **Using `yarn`**
 
