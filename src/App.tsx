@@ -257,7 +257,7 @@ function App() {
 								{ selected = false }: { selected?: boolean }
 							) => (
 								<div className={`chat-module__language-item ${selected && 'selected'}`} key={key}>
-									<span className={`fi ${value.icon}`}></span>
+									<img className='icon' src={value.icon} alt={`${value.name} icon`} />
 									<span>{value.name}</span>
 								</div>
 							)}
