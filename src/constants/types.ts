@@ -1,5 +1,5 @@
 export type Message = {
-	task: 'en' | 'vi';
+	task: string;
 	id: string;
 	dialogue_id: string;
 	username: string;
@@ -7,4 +7,14 @@ export type Message = {
 	origin: string;
 	edit: null;
 	rating: null | number;
+	type: string;
+	file?: {
+		type: string;
+		url: string;
+	};
+};
+
+export type ILanguage = {
+	key: string;
+	flag: string;
 };

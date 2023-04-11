@@ -2,26 +2,32 @@ import { useEffect, useRef, useState } from 'react';
 import { Message } from './constants/types';
 import { v4 as uuid } from 'uuid';
 import MessageComponent from './components/Message/Message.component';
-import { TASK_LIST, TaskListKey } from './constants/tasks';
-import { ClipIcon, XIcon } from './assets/icon';
+import { TASK_LIST } from './constants/tasks';
+import { ClipIcon, GearIcon, XIcon } from './assets/icon';
+import { LANGUAGES, LanguageKey } from './constants/language';
+import Dropdown from './components/Dropdown/Dropdown.component';
+import Record from './components/Record/Record.component';
 
 const user_id = uuid();
-let socket: WebSocket;
-const LANGUAGES = {
-	en: 'English',
-	vi: 'Vietnamese',
-};
 
-type LanguageKey = keyof typeof LANGUAGES;
+let socket: WebSocket;
 
 function App() {
 	const [showChat, setShowChat] = useState(false);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [showEdit, setShowEdit] = useState<string>('');
 	const [language, setLanguage] = useState<LanguageKey>('en');
+	const [showDropdown, setShowDropdown] = useState(false);
 	const messageListRef = useRef<HTMLDivElement>(null);
 
-	const appendMessage = (input: string, username: string) => {
+	const appendMessage = (
+		input: string,
+		username: string,
+		file?: {
+			type: string;
+			url: string;
+		}
+	) => {
 		const message: Message = {
 			id: user_id,
 			task: language,
@@ -31,6 +37,8 @@ function App() {
 			origin: input,
 			edit: null,
 			rating: null,
+			type: file?.type ? file.type : 'text',
+			file: file,
 		};
 		setMessages((prev) => [...prev, message]);
 	};
@@ -127,6 +135,23 @@ function App() {
 		saveMessage(message);
 	};
 
+	const onRecord = (file: File) => {
+		const reader = new FileReader();
+		reader.onload = () => {
+			appendMessage('', 'human', {
+				type: file.type,
+				url: reader.result as string,
+			});
+			// TODO
+			// Send file to server
+
+			setTimeout(() => {
+				appendMessage('Hello', 'bot');
+			});
+		};
+		reader.readAsDataURL(file);
+	};
+
 	useEffect(() => {
 		// Save the latest message
 		if (messages.length) {
@@ -138,6 +163,9 @@ function App() {
 			left: 0,
 			top: messageListRef.current.scrollHeight,
 		});
+		// Ignore missing 'message' by eslint, we do not want to re-run this when messages changes, only when the length changes.
+		// Other updates to the messages list itself already calls saveMessage()
+		// eslint-disable-next-line
 	}, [messages.length]);
 
 	useEffect(() => {
@@ -149,7 +177,7 @@ function App() {
 
 		const onSocketOpen = () => {
 			t = setInterval(function () {
-				if (socket.readyState != 1) {
+				if (socket.readyState !== 1) {
 					clearInterval(t);
 					return;
 				}
@@ -180,6 +208,8 @@ function App() {
 			// socket.removeEventListener('open', onSocketOpen);
 			// socket.close();
 		};
+		// Append message does not change.
+		// eslint-disable-next-line
 	}, []);
 
 	return (
@@ -195,26 +225,49 @@ function App() {
 				<div id='chat-module__header' onClick={() => setShowChat((prev) => !prev)}>
 					<div id='chat-module__title'>
 						<img src='/assets/images/logo2.jpg' alt='chat-module-logo' id='chat-module__logo' />
-						<h3>F.R.I.D.A.Y.</h3>
+						<h3>
+							{document.getElementById('chat-module-root')?.getAttribute('data-chat-name') ||
+								'F.R.I.D.A.Y'}
+						</h3>
 					</div>
-					<div id='chat-module__language-selector' onClick={(e) => e.stopPropagation()}>
-						{Object.keys(LANGUAGES).map((lang) => (
-							<div
-								key={lang}
-								className={`chat-module__language-radio ${lang === language ? 'active' : ''}`}
-							>
-								{lang.toLocaleUpperCase()}
-								<input
-									type='radio'
-									name='language'
-									checked={lang === language}
-									onChange={() => {
-										setMessages([]);
-										setLanguage(lang as LanguageKey);
-									}}
-								/>
-							</div>
-						))}
+					<div
+						id='chat-module__language-dropdown'
+						onClick={(e) => {
+							e.stopPropagation();
+							setShowDropdown((prev) => !prev);
+						}}
+					>
+						<GearIcon />
+						<Dropdown
+							open={showDropdown}
+							values={Object.entries(LANGUAGES)
+								.sort()
+								.map(([key, value]) => ({ key, value }))}
+							template={(
+								{
+									key,
+									value,
+								}: {
+									key: string;
+									value: {
+										icon: string;
+										name: string;
+									};
+								},
+								{ selected = false }: { selected?: boolean }
+							) => (
+								<div className={`chat-module__language-item ${selected && 'selected'}`} key={key}>
+									<span className={`fi ${value.icon}`}></span>
+									<span>{value.name}</span>
+								</div>
+							)}
+							id='chat-module__language-list'
+							onSelect={(key) => {
+								setLanguage(key as LanguageKey);
+								setMessages([]);
+							}}
+							selected={language}
+						/>
 					</div>
 				</div>
 				<div
@@ -248,10 +301,13 @@ function App() {
 						/>
 						<div id='chat-module__form-input-icon-container'>
 							<label htmlFor='file-img' className='chat-module__form-input-icon'>
-								<div>
+								<div style={{ opacity: 0.5 }}>
 									<ClipIcon />
 								</div>
 								<input id='file-img' type='file' />
+							</label>
+							<label htmlFor='voice' className='chat-module__form-input-icon'>
+								<Record setFile={onRecord} />
 							</label>
 						</div>
 						{/* <button id='chat-module__form-btn' type='submit'>
