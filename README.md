@@ -53,6 +53,85 @@ The location of the chat does not matter, since it relies on `position: fixed;` 
 
 The chat endpoint can be changed by modifying the `data-host` attribute of the `div`. This is mandatory for the chat to function.
 
+```html
+<div id="chat-module-root" data-host="ws://host"></div>
+```
+
+### 4. Adding language support requires the following steps
+
+- Add the language to the `LANGUAGES` map in `src/constants/language.ts`
+
+```js
+{
+  ...,
+  languageCode: {
+    name: 'Display name', // Vietnam (VI)
+    icon: 'link/to/icon', // https://link/to/icon
+  }
+}
+```
+
+> **Note**: `languageCode` should be in the format of [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) for consistency.
+
+- Re-config `TASK_LIST` in `src/constants/tasks.ts`
+
+- Rebuild the project
+
+### 5. Changing the theme (optional)
+
+**Default**:
+
+```css
+--text-primary: #d56871;
+--bg-primary: #0a2133;
+--bg-secondary: #fefefe;
+--bg-chat: #eff9ff;
+```
+
+This can be done via the `style` attribute of the `<div id='chat-module-root'></div>`:
+
+```html
+<div id="chat-module-root" data-host="ws://host" style="--text-primary: new-value; --bg-primary: new-value;"></div>
+```
+
+Or the `:root` selector.
+
+```css
+/* global.css */
+
+/* Global variable */
+:root {
+  --text-primary: new-value;
+  --bg-primary: new-value;
+}
+
+/* OR */
+
+/* Scope variable */
+#chat-module-root {
+  --text-primary: new-value;
+  --bg-primary: new-value;
+}
+```
+
+Then importing the file into the `index.html` after base `.css` file:
+
+```html
+<link rel="stylesheet" href="link/to/the/file.css" />
+<link rel="stylesheet" href="global.css" />
+```
+
+
+### 6. Changing the bot name (optional)
+
+**Default**: `F.R.I.D.A.Y`
+
+The bot name can be modified using the `data-chat-name` attribute of the `<div id='chat-module-root'></div>`.
+
+```html
+<div id="chat-module-root" data-host="ws://host" data-chat-name="Bot Name"></div>
+```
+
 <hr/>
 
 ## Building
