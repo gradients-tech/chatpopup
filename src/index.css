@@ -22,6 +22,11 @@ audio {
 	height: 40px;
 }
 
+.icon {
+	width: 1.8rem;
+	aspect-ratio: 1/1;
+}
+
 #chat-module-root {
 	position: fixed;
 	bottom: 1rem;
@@ -105,6 +110,7 @@ audio {
 	box-shadow: 0 0 1rem rgba(0, 0, 0, 0.2);
 	border-radius: 0.5rem;
 	padding: 0.5rem 0;
+	z-index: 1;
 }
 
 .chat-module__language-item {
